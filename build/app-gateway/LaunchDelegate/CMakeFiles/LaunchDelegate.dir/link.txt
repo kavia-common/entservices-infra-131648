@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -shared -Wl,-soname,libLaunchDelegate.so -o libLaunchDelegate.so CMakeFiles/LaunchDelegate.dir/Module.cpp.o CMakeFiles/LaunchDelegate.dir/LaunchDelegate.cpp.o  -lWPEFrameworkCore -lWPEFrameworkPlugins 

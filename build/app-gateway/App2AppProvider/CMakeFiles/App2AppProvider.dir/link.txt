@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -shared -Wl,-soname,libApp2AppProvider.so -o libApp2AppProvider.so CMakeFiles/App2AppProvider.dir/Module.cpp.o CMakeFiles/App2AppProvider.dir/App2AppProvider.cpp.o CMakeFiles/App2AppProvider.dir/App2AppProviderJsonRpc.cpp.o  -lWPEFrameworkCore -lWPEFrameworkPlugins -lWPEFrameworkTracing 

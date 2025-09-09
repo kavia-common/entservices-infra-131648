@@ -14,6 +14,30 @@
 # EXTERNAL cache entries
 ########################
 
+//Value Computed by CMake
+App2AppProvider_BINARY_DIR:STATIC=/home/kavia/workspace/code-generation/entservices-infra-131648/build/app-gateway/App2AppProvider
+
+//Value Computed by CMake
+App2AppProvider_IS_TOP_LEVEL:STATIC=OFF
+
+//Dependencies for the target
+App2AppProvider_LIB_DEPENDS:STATIC=general;WPEFrameworkCore;general;WPEFrameworkPlugins;general;WPEFrameworkTracing;
+
+//Value Computed by CMake
+App2AppProvider_SOURCE_DIR:STATIC=/home/kavia/workspace/code-generation/entservices-infra-131648/app-gateway/App2AppProvider
+
+//Value Computed by CMake
+AppGateway_BINARY_DIR:STATIC=/home/kavia/workspace/code-generation/entservices-infra-131648/build/app-gateway/AppGateway
+
+//Value Computed by CMake
+AppGateway_IS_TOP_LEVEL:STATIC=OFF
+
+//Dependencies for the target
+AppGateway_LIB_DEPENDS:STATIC=general;WPEFrameworkCore;general;WPEFrameworkPlugins;general;WPEFrameworkTracing;
+
+//Value Computed by CMake
+AppGateway_SOURCE_DIR:STATIC=/home/kavia/workspace/code-generation/entservices-infra-131648/app-gateway/AppGateway
+
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=/usr/bin/addr2line
 
@@ -241,46 +265,85 @@ EntServicesInfra_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 EntServicesInfra_SOURCE_DIR:STATIC=/home/kavia/workspace/code-generation/entservices-infra-131648
 
-//HAS_API_HDMI_INPUT
+//Enable HDMI Input API
 HAS_API_HDMI_INPUT:BOOL=ON
 
-//PLUGIN_CONTINUEWATCHING
+//Path to a file.
+IARMBUS_INCLUDE_DIRS:PATH=IARMBUS_INCLUDE_DIRS-NOTFOUND
+
+//Path to a library.
+IARMBUS_LIBRARIES:FILEPATH=IARMBUS_LIBRARIES-NOTFOUND
+
+//Path to a file.
+IARMHAL_INCLUDE_DIRS:PATH=IARMHAL_INCLUDE_DIRS-NOTFOUND
+
+//Path to a file.
+IARMRECEIVER_INCLUDE_DIRS:PATH=IARMRECEIVER_INCLUDE_DIRS-NOTFOUND
+
+//Value Computed by CMake
+LaunchDelegate_BINARY_DIR:STATIC=/home/kavia/workspace/code-generation/entservices-infra-131648/build/app-gateway/LaunchDelegate
+
+//Value Computed by CMake
+LaunchDelegate_IS_TOP_LEVEL:STATIC=OFF
+
+//Dependencies for the target
+LaunchDelegate_LIB_DEPENDS:STATIC=general;WPEFrameworkCore;general;WPEFrameworkPlugins;
+
+//Value Computed by CMake
+LaunchDelegate_SOURCE_DIR:STATIC=/home/kavia/workspace/code-generation/entservices-infra-131648/app-gateway/LaunchDelegate
+
+//Arguments to supply to pkg-config
+PKG_CONFIG_ARGN:STRING=
+
+//pkg-config executable
+PKG_CONFIG_EXECUTABLE:FILEPATH=/usr/bin/pkg-config
+
+//Include App2AppProvider plugin
+PLUGIN_APP2APP_PROVIDER:BOOL=OFF
+
+//Include AppGateway plugin
+PLUGIN_APPGATEWAY:BOOL=OFF
+
+//Enable ContinueWatching plugin
 PLUGIN_CONTINUEWATCHING:BOOL=ON
 
-//PLUGIN_COPILOT
+//Enable CoPilot plugin
 PLUGIN_COPILOT:BOOL=OFF
 
 //Path to default t2 profile
 PLUGIN_DEFAULT_PROFILES_FILE:STRING=/etc/t2profiles/default.json
 
-//PLUGIN_DEVICEDIAGNOSTICS
+//Enable DeviceDiagnostics plugin
 PLUGIN_DEVICEDIAGNOSTICS:BOOL=ON
 
-//PLUGIN_FRAMERATE
+//Enable Framerate plugin
 PLUGIN_FRAMERATE:BOOL=ON
 
-//PLUGIN_LEDCONTROL
+//Include LaunchDelegate plugin
+PLUGIN_LAUNCHDELEGATE:BOOL=OFF
+
+//Enable LEDControl plugin
 PLUGIN_LEDCONTROL:BOOL=ON
 
 //Include OCIContainer plugin
 PLUGIN_OCICONTAINER:BOOL=OFF
 
-//PLUGIN_SOUNDPLAYER
+//Enable SoundPlayer plugin
 PLUGIN_SOUNDPLAYER:BOOL=OFF
 
-//PLUGIN_STORAGE_MANAGER
-PLUGIN_STORAGE_MANAGER:BOOL=ON
+//Enable StorageManager plugin
+PLUGIN_STORAGE_MANAGER:BOOL=OFF
 
 //Path to t2 persistent folder
 PLUGIN_T2_PERSISTENT_FOLDER:STRING=/opt/.t2reportprofiles/
 
-//PLUGIN_TELEMETRY
-PLUGIN_TELEMETRY:BOOL=ON
+//Enable Telemetry plugin
+PLUGIN_TELEMETRY:BOOL=OFF
 
 //To configure startup order of Telemetry plugin
 PLUGIN_TELEMETRY_STARTUPORDER:STRING=
 
-//PLUGIN_WAREHOUSE
+//Enable Warehouse plugin
 PLUGIN_WAREHOUSE:BOOL=ON
 
 //Enable L1 tests
@@ -289,11 +352,11 @@ RDK_SERVICES_L1_TEST:BOOL=OFF
 //Enable L2 tests
 RDK_SERVICE_L2_TEST:BOOL=OFF
 
-//USE_IARM
-USE_IARM:BOOL=ON
+//Enable IARM integration (requires IARMBus)
+USE_IARM:BOOL=OFF
 
-//USE_IARM_BUS
-USE_IARM_BUS:BOOL=ON
+//Enable IARM Bus integration (requires IARMBus)
+USE_IARM_BUS:BOOL=OFF
 
 //The directory containing a CMake configuration file for WPEFramework.
 WPEFramework_DIR:PATH=WPEFramework_DIR-NOTFOUND
@@ -403,7 +466,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=2
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -448,6 +511,16 @@ CMAKE_TAPI-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Details about finding PkgConfig
+FIND_PACKAGE_MESSAGE_DETAILS_PkgConfig:INTERNAL=[/usr/bin/pkg-config][v1.8.1()]
+//ADVANCED property for variable: IARMBUS_INCLUDE_DIRS
+IARMBUS_INCLUDE_DIRS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: IARMBUS_LIBRARIES
+IARMBUS_LIBRARIES-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: PKG_CONFIG_ARGN
+PKG_CONFIG_ARGN-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: PKG_CONFIG_EXECUTABLE
+PKG_CONFIG_EXECUTABLE-ADVANCED:INTERNAL=1
 //linker supports push/pop state
 _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
 

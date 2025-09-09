@@ -69,6 +69,52 @@ if(COMCAST_CONFIG)
     else()
         message(WARNING "services.cmake not found; default plugin options may be unset.")
     endif()
+
+    # If WPEFramework is not found, gracefully disable plugins that require it.
+    # This prevents configuration failures when SDK paths are not provided.
+    if(NOT WPEFramework_FOUND)
+        set(_disabled_plugins "")
+        foreach(_p IN ITEMS
+            PLUGIN_USERSETTINGS
+            PLUGIN_USB_MASS_STORAGE
+            PLUGIN_OCICONTAINER
+            PLUGIN_PERSISTENTSTORE
+            PLUGIN_USBDEVICE
+            PLUGIN_TELEMETRY
+            PLUGIN_MONITOR
+            PLUGIN_RDKSHELL
+            PLUGIN_RUSTADAPTER
+            PLUGIN_MESSAGECONTROL
+            PLUGIN_RESOURCEMANAGER
+            PLUGIN_ANALYTICS
+            PLUGIN_RDK_WINDOW_MANAGER
+            PLUGIN_CLOUDSTORE
+            PLUGIN_SHAREDSTORAGE
+            PLUGIN_WEBBRIDGE
+            PLUGIN_LIFECYCLE_MANAGER
+            PLUGIN_APPMANAGER
+            PLUGIN_RUNTIME_MANAGER
+            PLUGIN_STORAGE_MANAGER
+            PLUGIN_PACKAGE_MANAGER
+            PLUGIN_NATIVEJS
+            PLUGIN_APPGATEWAY
+            PLUGIN_APP2APP_PROVIDER
+            PLUGIN_LAUNCHDELEGATE
+        )
+            if(DEFINED ${_p} AND ${_p})
+                # Mark OFF in cache so subsequent runs retain the setting
+                set(${_p} OFF CACHE BOOL "Auto-disabled: requires WPEFramework which was not found" FORCE)
+                list(APPEND _disabled_plugins ${_p})
+            endif()
+        endforeach()
+
+        if(_disabled_plugins)
+            list(JOIN _disabled_plugins ", " _disabled_plugins_str)
+            message(STATUS "WPEFramework not found. Disabled plugins: ${_disabled_plugins_str}")
+        else()
+            message(STATUS "WPEFramework not found. No plugins were enabled, nothing to disable.")
+        endif()
+    endif()
 endif()
 
 # Tests
