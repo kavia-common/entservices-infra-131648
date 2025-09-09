@@ -4,6 +4,20 @@ This Thunder plugin allows for control of OCI containers using the Dobby hypervi
 
 It interfaces with Dobby over the existing dbus API
 
+Quick JSON-RPC summary
+- listContainers() -> { containers: [{ Id: string, Descriptor: int }] }
+- getContainerState(containerId) -> { state: string, success: bool }
+- getContainerInfo(containerId) -> { info: object, success: bool }
+- startContainer(containerId, bundlePath, command?, westerosSocket?) -> { descriptor: int, success: bool }
+- startContainerFromDobbySpec(containerId, dobbySpec, command?) -> { descriptor: int, success: bool }
+- stopContainer(containerId, force?: bool) -> { success: bool }
+- pauseContainer(containerId) -> { success: bool }
+- resumeContainer(containerId) -> { success: bool }
+- executeCommand(containerId, options, command) -> { success: bool }
+
+Notifications
+- onContainerEvent { "id": string, "state": string, "msg"?: string }
+
 # APIs
 ## listContainers
 List all running OCI containers Dobby knows about
