@@ -69,6 +69,7 @@ endif()
 
 # Attempt to find EntServicesInfraPlugins only if the backend is enabled
 if (ENABLE_TELEMETRY_ESI_BACKEND)
+    # Make ESI backend optional: if the package isn't found, build without it
     find_package(EntServicesInfraPlugins QUIET)
     if (EntServicesInfraPlugins_FOUND)
         message(STATUS "Telemetry: EntServicesInfraPlugins found; enabling ESI backend integration")
