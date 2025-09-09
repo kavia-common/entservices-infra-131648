@@ -146,6 +146,16 @@ set (STORAGE_MANAGER_INC ${CMAKE_SOURCE_DIR}/../entservices-infra/StorageManager
 set (STORAGE_MANAGER_LIBS ${NAMESPACE}StorageManager ${NAMESPACE}StorageManagerImplementation)
 add_plugin_test_ex(PLUGIN_STORAGE_MANAGER tests/test_StorageManager.cpp "${STORAGE_MANAGER_INC}" "${STORAGE_MANAGER_LIBS}")
 
+# Add AppGateway and App2AppProvider tests
+# Include directories for plugins and helpers
+set (APPGATEWAY_INC ${CMAKE_SOURCE_DIR}/../entservices-infra/app-gateway/AppGateway ${CMAKE_SOURCE_DIR}/../entservices-infra/helpers)
+set (APPGATEWAY_LIBS ${NAMESPACE}AppGateway)
+add_plugin_test_ex(PLUGIN_APPGATEWAY tests/test_AppGateway.cpp "${APPGATEWAY_INC}" "${APPGATEWAY_LIBS}")
+
+set (APP2APP_INC ${CMAKE_SOURCE_DIR}/../entservices-infra/app-gateway/App2AppProvider ${CMAKE_SOURCE_DIR}/../entservices-infra/helpers)
+set (APP2APP_LIBS ${NAMESPACE}App2AppProvider)
+add_plugin_test_ex(PLUGIN_APP2APPPROVIDER tests/test_App2AppProvider.cpp "${APP2APP_INC}" "${APP2APP_LIBS}")
+
 add_library(${MODULE_NAME} SHARED ${TEST_SRC})
 
 if (RDK_SERVICES_L1_TEST)
