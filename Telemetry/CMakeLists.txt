@@ -67,15 +67,18 @@ if (SEC_UTIL_LIB AND NOT ${SEC_UTIL_LIB} STREQUAL "SEC_UTIL_LIB-NOTFOUND")
     set(SEC_UTIL_LIBRARIES ${SEC_UTIL_LIB})
 endif()
 
-# Attempt to find EntServicesInfraPlugins only if the backend is enabled
+# Attempt to find EntServicesInfraPlugins only if the backend is enabled.
+# IMPORTANT: This must remain fully optional. Do NOT add REQUIRED here.
 if (ENABLE_TELEMETRY_ESI_BACKEND)
-    # Make ESI backend optional: if the package isn't found, build without it
+    set(TELEMETRY_HAVE_ESI_BACKEND FALSE)
+    # Avoid CMake attempting to locate a config package unless present in the toolchain/SDK.
+    # We only probe QUIETly; if not found, we proceed without ESI backend.
     find_package(EntServicesInfraPlugins QUIET)
     if (EntServicesInfraPlugins_FOUND)
         message(STATUS "Telemetry: EntServicesInfraPlugins found; enabling ESI backend integration")
         set(TELEMETRY_HAVE_ESI_BACKEND TRUE)
     else()
-        message(WARNING "Telemetry: EntServicesInfraPlugins not found; building without ESI backend")
+        message(STATUS "Telemetry: EntServicesInfraPlugins not found; building without ESI backend")
         set(TELEMETRY_HAVE_ESI_BACKEND FALSE)
     endif()
 else()

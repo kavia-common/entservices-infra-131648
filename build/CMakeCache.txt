@@ -14,9 +14,6 @@
 # EXTERNAL cache entries
 ########################
 
-//Allow skipping optional test dependencies if unavailable
-ALLOW_OPTIONAL_TEST_DEPS:BOOL=ON
-
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=/usr/bin/addr2line
 
@@ -25,7 +22,7 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 
 //Choose the type of build, options are: None Debug Release RelWithDebInfo
 // MinSizeRel ...
-CMAKE_BUILD_TYPE:STRING=Release
+CMAKE_BUILD_TYPE:STRING=
 
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
@@ -239,12 +236,6 @@ EntServicesInfra_SOURCE_DIR:STATIC=/home/kavia/workspace/code-generation/entserv
 //HAS_API_HDMI_INPUT
 HAS_API_HDMI_INPUT:BOOL=ON
 
-//No help, variable specified on the command line.
-PLUGIN_APP2APPPROVIDER:UNINITIALIZED=ON
-
-//No help, variable specified on the command line.
-PLUGIN_APPGATEWAY:UNINITIALIZED=ON
-
 //PLUGIN_CONTINUEWATCHING
 PLUGIN_CONTINUEWATCHING:BOOL=ON
 
@@ -270,7 +261,7 @@ PLUGIN_OCICONTAINER:BOOL=OFF
 PLUGIN_SOUNDPLAYER:BOOL=OFF
 
 //PLUGIN_STORAGE_MANAGER
-PLUGIN_STORAGE_MANAGER:BOOL=OFF
+PLUGIN_STORAGE_MANAGER:BOOL=ON
 
 //Path to t2 persistent folder
 PLUGIN_T2_PERSISTENT_FOLDER:STRING=/opt/.t2reportprofiles/
@@ -284,20 +275,8 @@ PLUGIN_TELEMETRY_STARTUPORDER:STRING=
 //PLUGIN_WAREHOUSE
 PLUGIN_WAREHOUSE:BOOL=ON
 
-//The directory containing a CMake configuration file for Plugins.
-Plugins_DIR:PATH=Plugins_DIR-NOTFOUND
-
-//Value Computed by CMake
-Project_BINARY_DIR:STATIC=/home/kavia/workspace/code-generation/entservices-infra-131648/build
-
-//Value Computed by CMake
-Project_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-Project_SOURCE_DIR:STATIC=/home/kavia/workspace/code-generation/entservices-infra-131648
-
 //Enable L1 tests
-RDK_SERVICES_L1_TEST:BOOL=ON
+RDK_SERVICES_L1_TEST:BOOL=OFF
 
 //Enable L2 tests
 RDK_SERVICE_L2_TEST:BOOL=OFF
@@ -416,7 +395,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=3
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=2
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
