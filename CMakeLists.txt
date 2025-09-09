@@ -27,6 +27,13 @@ project(EntServicesInfra LANGUAGES C CXX)
 # are located in the cmake directory. Include it in the search.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/" "${CMAKE_SOURCE_DIR}/cmake/modules" "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
+# Opt-in static analysis tools
+option(ENABLE_CLANG_TIDY "Enable clang-tidy static analysis during build (requires clang-tidy available)" OFF)
+option(ENABLE_CPPCHECK "Enable cppcheck static analysis during build (requires cppcheck available)" OFF)
+
+# If requested, wire up static analysis toolchains (sets CMAKE_CXX_CLANG_TIDY / CMAKE_CXX_CPPCHECK)
+include(StaticAnalysis)
+
 # Options to control optional components/deps
 option(COMCAST_CONFIG "Comcast services configuration" ON)
 option(PLUGIN_OCICONTAINER "Include OCIContainer plugin" OFF)

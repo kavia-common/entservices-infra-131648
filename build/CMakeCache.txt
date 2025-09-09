@@ -221,6 +221,14 @@ COMCAST_CONFIG:BOOL=ON
 //Disable security token
 DISABLE_SECURITY_TOKEN:BOOL=OFF
 
+//Enable clang-tidy static analysis during build (requires clang-tidy
+// available)
+ENABLE_CLANG_TIDY:BOOL=OFF
+
+//Enable cppcheck static analysis during build (requires cppcheck
+// available)
+ENABLE_CPPCHECK:BOOL=OFF
+
 //The directory containing a CMake configuration file for EntServicesInfraPlugins.
 EntServicesInfraPlugins_DIR:PATH=EntServicesInfraPlugins_DIR-NOTFOUND
 

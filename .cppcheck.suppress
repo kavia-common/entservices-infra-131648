@@ -1,0 +1,9 @@
+# Common system include false positive
+missingIncludeSystem
+
+# Suppressions that are typically noisy in large plugin repos; add file-specific ones inline with // cppcheck-suppress <id>
+noCopyConstructor
+noOperatorEq
+
+# Avoid duplicate suppression warnings when not applicable
+unmatchedSuppression
