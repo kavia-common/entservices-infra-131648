@@ -18,7 +18,36 @@
 ###
 
 # Minimum required must be before project()
-cmake_minimum_required(VERSION 3.10)
+# Use a modern baseline to ensure consistent policy behavior and features.
+# 3.16 is widely available (e.g., in many LTS distros and Yocto releases) and avoids numerous policy warnings.
+cmake_minimum_required(VERSION 3.16)
+
+# Proactively set CMake policies to NEW to suppress warnings and ensure predictable behavior.
+# These guards make the file compatible with various CMake versions without spurious policy warnings.
+if(POLICY CMP0048)
+  # project() command manages VERSION variables when a VERSION is given.
+  cmake_policy(SET CMP0048 NEW)
+endif()
+if(POLICY CMP0054)
+  # Only interpret if() arguments as variables or keywords when unquoted.
+  cmake_policy(SET CMP0054 NEW)
+endif()
+if(POLICY CMP0057)
+  # Support IN_LIST operator.
+  cmake_policy(SET CMP0057 NEW)
+endif()
+if(POLICY CMP0074)
+  # find_package() uses <PackageName>_ROOT variables.
+  cmake_policy(SET CMP0074 NEW)
+endif()
+if(POLICY CMP0077)
+  # option() honors variables set in the cache or on the command line.
+  cmake_policy(SET CMP0077 NEW)
+endif()
+if(POLICY CMP0091)
+  # MSVC runtime library is selected by CMAKE_MSVC_RUNTIME_LIBRARY.
+  cmake_policy(SET CMP0091 NEW)
+endif()
 
 # Declare project so CMAKE_PROJECT_NAME and related variables exist
 project(EntServicesInfra LANGUAGES C CXX)
