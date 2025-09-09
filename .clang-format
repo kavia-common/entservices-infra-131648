@@ -1,0 +1,43 @@
+# Clang-Format configuration for entservices-infra-131648
+# Goal: Minimal diffs while aligning with common WPEFramework/Thunder norms.
+# Base on LLVM style with selective overrides.
+
+BasedOnStyle: LLVM
+
+# Line width and indentation
+ColumnLimit: 120
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# Braces and layout
+BreakBeforeBraces: Attach
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+# Pointer/reference alignment (code commonly uses 'type * var')
+PointerAlignment: Middle
+DerivePointerAlignment: false
+
+# Function parameters and arguments wrapping (avoid aggressive bin-packing)
+BinPackArguments: false
+BinPackParameters: false
+AlignAfterOpenBracket: DontAlign
+
+# Includes: preserve existing order to minimize diffs
+SortIncludes: false
+IncludeBlocks: Preserve
+
+# Spacing preferences
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpaceAfterCStyleCast: true
+SpaceBeforeCtorInitializerColon: true
+
+# Namespaces and access modifiers
+NamespaceIndentation: None
+# Keep LLVM default (-2). Not setting AccessModifierOffset explicitly to avoid unexpected shifts.
+
+# Comments
+ReflowComments: false
