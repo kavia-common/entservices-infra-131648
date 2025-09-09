@@ -1,0 +1,11 @@
+{
+  "callsign": "App2AppProvider",
+  "locator": "libApp2AppProvider.so",
+  "classname": "App2AppProvider",
+  "autostart": @AUTOSTART@,
+  "configuration": {
+    "enabled": @ENABLED@,
+    "providerId": "@PROVIDER_ID@",
+    "capabilities": @CAPABILITIES@
+  }
+}

@@ -140,6 +140,18 @@ if(PLUGIN_NATIVEJS)
 	add_subdirectory(NativeJS)
 endif()
 
+# New AppGateway plugin integration
+option(PLUGIN_APPGATEWAY "Include AppGateway plugin" ON)
+if(PLUGIN_APPGATEWAY)
+    add_subdirectory(app-gateway/AppGateway)
+endif()
+
+# New App2AppProvider plugin integration
+option(PLUGIN_APP2APP_PROVIDER "Include App2AppProvider plugin" ON)
+if(PLUGIN_APP2APP_PROVIDER)
+    add_subdirectory(app-gateway/App2AppProvider)
+endif()
+
 if(WPEFRAMEWORK_CREATE_IPKG_TARGETS)
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEB_COMPONENT_INSTALL ON)
