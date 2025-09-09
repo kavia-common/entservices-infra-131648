@@ -1,0 +1,9 @@
+{
+    "autoStart": false,
+    "precondition": [],
+    "termination": "activated",
+    "configuration": {
+        "enabled": true,
+        "routeTable": ""
+    }
+}
