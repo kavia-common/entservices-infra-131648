@@ -49,6 +49,9 @@ namespace Plugin {
                 Core::SafeSyncType<Core::CriticalSection> scope(_adminLock);
                 _state = _config.Enabled.IsSet() && _config.Enabled.Value() ? _T("Enabled") : _T("Disabled");
             }
+
+            // Emit lifecycle state event on initialization
+            event_statechanged(Core::JSON::String(_state));
         } else {
             message = _T("Service shell is null");
         }
@@ -59,10 +62,22 @@ namespace Plugin {
     void App2AppProvider::Deinitialize(PluginHost::IShell* service)
     {
         ASSERT(service == _service);
-        Core::SafeSyncType<Core::CriticalSection> scope(_adminLock);
-        _service = nullptr;
-        _state = _T("Deinitialized");
-        _apps.clear();
+
+        // Update state to Disabled for deactivation and notify clients
+        {
+            Core::SafeSyncType<Core::CriticalSection> scope(_adminLock);
+            _state = _T("Disabled");
+        }
+
+        // Emit lifecycle state event while plugin is still active
+        event_statechanged(Core::JSON::String(_state));
+
+        // Cleanup internal state
+        {
+            Core::SafeSyncType<Core::CriticalSection> scope(_adminLock);
+            _apps.clear();
+            _service = nullptr;
+        }
     }
 
     string App2AppProvider::Information() const
