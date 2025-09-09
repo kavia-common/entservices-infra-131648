@@ -219,6 +219,19 @@ namespace Plugin {
 
     uint32_t App2AppProvider::endpoint_registerApp(const Core::JSON::Object& params, Core::JSON::Object& response)
     {
+        // Enforce enabled/disabled gating: only proceed if enabled
+        bool enabled = false;
+        {
+            Core::SafeSyncType<Core::CriticalSection> scope(_adminLock);
+            enabled = (_state == _T("Enabled"));
+        }
+        if (!enabled) {
+            Core::JSON::String msg;
+            msg = _T("Service unavailable: App2AppProvider is disabled");
+            response.Set(_T("message"), msg);
+            return Core::ERROR_UNAVAILABLE;
+        }
+
         Core::JSON::String appId;
 
         // Validate required param presence
@@ -251,6 +264,19 @@ namespace Plugin {
 
     uint32_t App2AppProvider::endpoint_unregisterApp(const Core::JSON::Object& params, Core::JSON::Object& response)
     {
+        // Enforce enabled/disabled gating: only proceed if enabled
+        bool enabled = false;
+        {
+            Core::SafeSyncType<Core::CriticalSection> scope(_adminLock);
+            enabled = (_state == _T("Enabled"));
+        }
+        if (!enabled) {
+            Core::JSON::String msg;
+            msg = _T("Service unavailable: App2AppProvider is disabled");
+            response.Set(_T("message"), msg);
+            return Core::ERROR_UNAVAILABLE;
+        }
+
         Core::JSON::String appId;
 
         // Validate required param presence
@@ -283,6 +309,19 @@ namespace Plugin {
 
     uint32_t App2AppProvider::endpoint_sendMessage(const Core::JSON::Object& params, Core::JSON::Object& response)
     {
+        // Enforce enabled/disabled gating: only proceed if enabled
+        bool enabled = false;
+        {
+            Core::SafeSyncType<Core::CriticalSection> scope(_adminLock);
+            enabled = (_state == _T("Enabled"));
+        }
+        if (!enabled) {
+            Core::JSON::String msg;
+            msg = _T("Service unavailable: App2AppProvider is disabled");
+            response.Set(_T("message"), msg);
+            return Core::ERROR_UNAVAILABLE;
+        }
+
         Core::JSON::String from;
         Core::JSON::String to;
         Core::JSON::String payload;
@@ -332,6 +371,19 @@ namespace Plugin {
 
     uint32_t App2AppProvider::endpoint_listApps(Core::JSON::Object& response)
     {
+        // Enforce enabled/disabled gating: only proceed if enabled
+        bool enabled = false;
+        {
+            Core::SafeSyncType<Core::CriticalSection> scope(_adminLock);
+            enabled = (_state == _T("Enabled"));
+        }
+        if (!enabled) {
+            Core::JSON::String msg;
+            msg = _T("Service unavailable: App2AppProvider is disabled");
+            response.Set(_T("message"), msg);
+            return Core::ERROR_UNAVAILABLE;
+        }
+
         Core::JSON::ArrayType<Core::JSON::String> apps;
         {
             Core::SafeSyncType<Core::CriticalSection> scope(_adminLock);
