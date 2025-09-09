@@ -37,6 +37,13 @@ protected:
         plugin->UnregisterAll();
         plugin->Deinitialize(&service);
     }
+
+    void EnableProvider() {
+        string resp;
+        EXPECT_EQ(Core::ERROR_NONE, handler.Invoke(connection, _T("configure"),
+            _T("{\"enabled\":true}"), resp));
+        EXPECT_THAT(resp, ::testing::HasSubstr("\"enabled\""));
+    }
 };
 
 // A2P-1: ping
@@ -70,6 +77,8 @@ TEST_F(App2AppProviderTest, ConfigureSetsStateAndFields) {
 
 // A2P-4/A2P-5: register app and idempotency
 TEST_F(App2AppProviderTest, RegisterAppAndDuplicate) {
+    EnableProvider();
+
     // Register AppA
     EXPECT_EQ(Core::ERROR_NONE, handler.Invoke(connection, _T("registerApp"),
         _T("{\"appId\":\"AppA\"}"), response));
@@ -80,7 +89,6 @@ TEST_F(App2AppProviderTest, RegisterAppAndDuplicate) {
     EXPECT_EQ(Core::ERROR_NONE, handler.Invoke(connection, _T("registerApp"),
         _T("{\"appId\":\"AppA\"}"), resp2));
     // Implementation returns false for duplicate (since set insert fails)
-    // Accept either true (idempotent) or false depending on impl; here expect false
     EXPECT_THAT(resp2, ::testing::HasSubstr("\"registered\":false"));
 
     // List apps should contain AppA
@@ -91,6 +99,8 @@ TEST_F(App2AppProviderTest, RegisterAppAndDuplicate) {
 
 // A2P-6/A2P-7: unregister app and unknown
 TEST_F(App2AppProviderTest, UnregisterKnownAndUnknown) {
+    EnableProvider();
+
     // Pre: register AppA
     ASSERT_EQ(Core::ERROR_NONE, handler.Invoke(connection, _T("registerApp"),
         _T("{\"appId\":\"AppA\"}"), response));
@@ -109,6 +119,8 @@ TEST_F(App2AppProviderTest, UnregisterKnownAndUnknown) {
 
 // A2P-8/A2P-9: send message success and fail
 TEST_F(App2AppProviderTest, SendMessageSuccessAndFail) {
+    EnableProvider();
+
     // Register A and B
     ASSERT_EQ(Core::ERROR_NONE, handler.Invoke(connection, _T("registerApp"),
         _T("{\"appId\":\"AppA\"}"), response));
@@ -136,6 +148,8 @@ TEST_F(App2AppProviderTest, ListAppsAfterOps) {
     EXPECT_EQ(string(), plugin->Initialize(&service));
     plugin->RegisterAll();
 
+    EnableProvider();
+
     ASSERT_EQ(Core::ERROR_NONE, handler.Invoke(connection, _T("registerApp"),
         _T("{\"appId\":\"AppA\"}"), response));
     ASSERT_EQ(Core::ERROR_NONE, handler.Invoke(connection, _T("registerApp"),
@@ -149,14 +163,125 @@ TEST_F(App2AppProviderTest, ListAppsAfterOps) {
     EXPECT_THAT(listResp, ::testing::Not(::testing::HasSubstr("AppA")));
 }
 
-// Negative cases: missing fields
+// A2P-11: Disabled gating - ensure methods are unavailable when disabled
+TEST_F(App2AppProviderTest, DisabledGatingEnforced) {
+    // By default, provider starts Disabled (no enabled=true in config)
+
+    // registerApp
+    string regResp;
+    EXPECT_EQ(Core::ERROR_UNAVAILABLE, handler.Invoke(connection, _T("registerApp"),
+        _T("{\"appId\":\"AppA\"}"), regResp));
+    EXPECT_THAT(regResp, ::testing::HasSubstr("Service unavailable"));
+
+    // unregisterApp
+    string unregResp;
+    EXPECT_EQ(Core::ERROR_UNAVAILABLE, handler.Invoke(connection, _T("unregisterApp"),
+        _T("{\"appId\":\"AppA\"}"), unregResp));
+    EXPECT_THAT(unregResp, ::testing::HasSubstr("Service unavailable"));
+
+    // sendMessage
+    string sendResp;
+    EXPECT_EQ(Core::ERROR_UNAVAILABLE, handler.Invoke(connection, _T("sendMessage"),
+        _T("{\"from\":\"A\",\"to\":\"B\",\"payload\":\"x\"}"), sendResp));
+    EXPECT_THAT(sendResp, ::testing::HasSubstr("Service unavailable"));
+
+    // listApps
+    string listResp;
+    EXPECT_EQ(Core::ERROR_UNAVAILABLE, handler.Invoke(connection, _T("listApps"), _T("{}"), listResp));
+    EXPECT_THAT(listResp, ::testing::HasSubstr("Service unavailable"));
+
+    // ping should work
+    string pingResp;
+    EXPECT_EQ(Core::ERROR_NONE, handler.Invoke(connection, _T("ping"), _T("\"\""), pingResp));
+    EXPECT_EQ(string("\"pong\""), pingResp);
+
+    // getInfo should work
+    string infoResp;
+    EXPECT_EQ(Core::ERROR_NONE, handler.Invoke(connection, _T("getInfo"), _T("{}"), infoResp));
+    EXPECT_THAT(infoResp, ::testing::HasSubstr("state"));
+
+    // configure should work (e.g. set providerId only, without enabling)
+    string cfgResp;
+    EXPECT_EQ(Core::ERROR_NONE, handler.Invoke(connection, _T("configure"),
+        _T("{\"providerId\":\"prov-disabled\"}"), cfgResp));
+    EXPECT_THAT(cfgResp, ::testing::HasSubstr("prov-disabled"));
+}
+
+// A2P-12: Parameter validation errors and messages for registerApp, unregisterApp, sendMessage, and configure
+TEST_F(App2AppProviderTest, ParameterValidationErrors) {
+    EnableProvider();
+
+    // registerApp: missing appId
+    string resp;
+    EXPECT_EQ(Core::ERROR_GENERAL, handler.Invoke(connection, _T("registerApp"), _T("{}"), resp));
+    EXPECT_THAT(resp, ::testing::HasSubstr("Validation error"));
+    EXPECT_THAT(resp, ::testing::HasSubstr("appId"));
+    EXPECT_THAT(resp, ::testing::HasSubstr("required"));
+
+    // registerApp: empty appId
+    resp.clear();
+    EXPECT_EQ(Core::ERROR_GENERAL, handler.Invoke(connection, _T("registerApp"),
+        _T("{\"appId\":\"\"}"), resp));
+    EXPECT_THAT(resp, ::testing::HasSubstr("Validation error"));
+    EXPECT_THAT(resp, ::testing::HasSubstr("non-empty"));
+
+    // unregisterApp: missing appId
+    resp.clear();
+    EXPECT_EQ(Core::ERROR_GENERAL, handler.Invoke(connection, _T("unregisterApp"), _T("{}"), resp));
+    EXPECT_THAT(resp, ::testing::HasSubstr("Validation error"));
+    EXPECT_THAT(resp, ::testing::HasSubstr("appId"));
+    EXPECT_THAT(resp, ::testing::HasSubstr("required"));
+
+    // unregisterApp: empty appId
+    resp.clear();
+    EXPECT_EQ(Core::ERROR_GENERAL, handler.Invoke(connection, _T("unregisterApp"),
+        _T("{\"appId\":\"\"}"), resp));
+    EXPECT_THAT(resp, ::testing::HasSubstr("Validation error"));
+    EXPECT_THAT(resp, ::testing::HasSubstr("non-empty"));
+
+    // sendMessage: missing fields
+    resp.clear();
+    EXPECT_EQ(Core::ERROR_GENERAL, handler.Invoke(connection, _T("sendMessage"),
+        _T("{\"from\":\"A\"}"), resp));
+    EXPECT_THAT(resp, ::testing::HasSubstr("Validation error"));
+    EXPECT_THAT(resp, ::testing::HasSubstr("'from', 'to', and 'payload' are required"));
+
+    // sendMessage: empty from and to
+    resp.clear();
+    EXPECT_EQ(Core::ERROR_GENERAL, handler.Invoke(connection, _T("sendMessage"),
+        _T("{\"from\":\"\",\"to\":\"\",\"payload\":\"x\"}"), resp));
+    EXPECT_THAT(resp, ::testing::HasSubstr("Validation error"));
+    EXPECT_THAT(resp, ::testing::HasSubstr("'from' must be a non-empty string"));
+
+    // configure: invalid providerId (empty)
+    resp.clear();
+    EXPECT_EQ(Core::ERROR_GENERAL, handler.Invoke(connection, _T("configure"),
+        _T("{\"providerId\":\"\"}"), resp));
+    EXPECT_THAT(resp, ::testing::HasSubstr("Validation error"));
+    EXPECT_THAT(resp, ::testing::HasSubstr("providerId"));
+    EXPECT_THAT(resp, ::testing::HasSubstr("non-empty"));
+
+    // configure: invalid capabilities (contains null)
+    resp.clear();
+    EXPECT_EQ(Core::ERROR_GENERAL, handler.Invoke(connection, _T("configure"),
+        _T("{\"capabilities\":[null]}"), resp));
+    EXPECT_THAT(resp, ::testing::HasSubstr("Validation error"));
+    EXPECT_THAT(resp, ::testing::HasSubstr("capabilities"));
+}
+
+// Negative cases: missing fields (legacy test updated to match current error codes/messages)
 TEST_F(App2AppProviderTest, NegativeMissingFields) {
+    EnableProvider();
+
     // Missing appId in register
-    EXPECT_EQ(Core::ERROR_BAD_REQUEST, handler.Invoke(connection, _T("registerApp"), _T("{}"), response));
+    EXPECT_EQ(Core::ERROR_GENERAL, handler.Invoke(connection, _T("registerApp"), _T("{}"), response));
+    EXPECT_THAT(response, ::testing::HasSubstr("Validation error"));
 
     // Missing appId in unregister
-    EXPECT_EQ(Core::ERROR_BAD_REQUEST, handler.Invoke(connection, _T("unregisterApp"), _T("{}"), response));
+    EXPECT_EQ(Core::ERROR_GENERAL, handler.Invoke(connection, _T("unregisterApp"), _T("{}"), response));
+    EXPECT_THAT(response, ::testing::HasSubstr("Validation error"));
 
     // Missing message fields
-    EXPECT_EQ(Core::ERROR_BAD_REQUEST, handler.Invoke(connection, _T("sendMessage"), _T("{\"from\":\"A\"}"), response));
+    EXPECT_EQ(Core::ERROR_GENERAL, handler.Invoke(connection, _T("sendMessage"), _T("{\"from\":\"A\"}"), response));
+    EXPECT_THAT(response, ::testing::HasSubstr("Validation error"));
 }
