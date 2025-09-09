@@ -154,16 +154,50 @@ namespace Plugin {
         Core::JSON::String providerId;
         Core::JSON::ArrayType<Core::JSON::String> caps;
 
+        // Validate and apply 'enabled' (optional, boolean)
         if (params.HasLabel(_T("enabled"))) {
             enabled = params.Get<Core::JSON::Boolean>(_T("enabled"));
             _config.Enabled = enabled;
         }
+
+        // Validate and apply 'providerId' (optional, must be a non-empty string if present)
         if (params.HasLabel(_T("providerId"))) {
             providerId = params.Get<Core::JSON::String>(_T("providerId"));
+            if (providerId.Value().empty()) {
+                Core::JSON::String msg;
+                msg = _T("Validation error: 'providerId' must be a non-empty string.");
+                response.Set(_T("message"), msg);
+                return Core::ERROR_GENERAL;
+            }
             _config.ProviderId = providerId;
         }
+
+        // Validate and apply 'capabilities' (optional, must be an array-of-strings if present)
         if (params.HasLabel(_T("capabilities"))) {
             caps = params.Get<Core::JSON::ArrayType<Core::JSON::String>>(_T("capabilities"));
+
+            // Iterate to ensure elements are strings; ArrayType<Core::JSON::String> enforces type,
+            // but we further ensure entries are not null-like.
+            bool invalid = false;
+            Core::JSON::ArrayType<Core::JSON::String>::Iterator index(caps.Elements());
+            while (index.Next() == true) {
+                const Core::JSON::String& v = index.Current();
+                // Type is string by template; allow empty strings but ensure no null/undefined
+                // If stricter behavior is desired (no empty strings), uncomment the block below.
+                // if (v.Value().empty()) { invalid = true; break; }
+                if (!v.IsSet()) {
+                    invalid = true;
+                    break;
+                }
+            }
+
+            if (invalid) {
+                Core::JSON::String msg;
+                msg = _T("Validation error: 'capabilities' must be an array of strings.");
+                response.Set(_T("message"), msg);
+                return Core::ERROR_GENERAL;
+            }
+
             _config.Capabilities = caps;
         }
 
@@ -186,10 +220,24 @@ namespace Plugin {
     uint32_t App2AppProvider::endpoint_registerApp(const Core::JSON::Object& params, Core::JSON::Object& response)
     {
         Core::JSON::String appId;
+
+        // Validate required param presence
         if (!params.HasLabel(_T("appId"))) {
-            return Core::ERROR_BAD_REQUEST;
+            Core::JSON::String msg;
+            msg = _T("Validation error: 'appId' is required and must be a non-empty string.");
+            response.Set(_T("message"), msg);
+            return Core::ERROR_GENERAL;
         }
+
         appId = params.Get<Core::JSON::String>(_T("appId"));
+
+        // Validate non-empty string
+        if (appId.Value().empty()) {
+            Core::JSON::String msg;
+            msg = _T("Validation error: 'appId' must be a non-empty string.");
+            response.Set(_T("message"), msg);
+            return Core::ERROR_GENERAL;
+        }
 
         bool ok = RegisterAppInternal(appId.Value());
         Core::JSON::Boolean registered;
@@ -204,10 +252,24 @@ namespace Plugin {
     uint32_t App2AppProvider::endpoint_unregisterApp(const Core::JSON::Object& params, Core::JSON::Object& response)
     {
         Core::JSON::String appId;
+
+        // Validate required param presence
         if (!params.HasLabel(_T("appId"))) {
-            return Core::ERROR_BAD_REQUEST;
+            Core::JSON::String msg;
+            msg = _T("Validation error: 'appId' is required and must be a non-empty string.");
+            response.Set(_T("message"), msg);
+            return Core::ERROR_GENERAL;
         }
+
         appId = params.Get<Core::JSON::String>(_T("appId"));
+
+        // Validate non-empty string
+        if (appId.Value().empty()) {
+            Core::JSON::String msg;
+            msg = _T("Validation error: 'appId' must be a non-empty string.");
+            response.Set(_T("message"), msg);
+            return Core::ERROR_GENERAL;
+        }
 
         bool ok = UnregisterAppInternal(appId.Value());
         Core::JSON::Boolean unregistered;
@@ -225,12 +287,31 @@ namespace Plugin {
         Core::JSON::String to;
         Core::JSON::String payload;
 
+        // Validate required labels
         if (!params.HasLabel(_T("from")) || !params.HasLabel(_T("to")) || !params.HasLabel(_T("payload"))) {
-            return Core::ERROR_BAD_REQUEST;
+            Core::JSON::String msg;
+            msg = _T("Validation error: 'from', 'to', and 'payload' are required. 'from' and 'to' must be non-empty strings; 'payload' must be a string.");
+            response.Set(_T("message"), msg);
+            return Core::ERROR_GENERAL;
         }
+
         from = params.Get<Core::JSON::String>(_T("from"));
         to = params.Get<Core::JSON::String>(_T("to"));
         payload = params.Get<Core::JSON::String>(_T("payload"));
+
+        // Validate appId strings (must be non-empty)
+        if (from.Value().empty()) {
+            Core::JSON::String msg;
+            msg = _T("Validation error: 'from' must be a non-empty string.");
+            response.Set(_T("message"), msg);
+            return Core::ERROR_GENERAL;
+        }
+        if (to.Value().empty()) {
+            Core::JSON::String msg;
+            msg = _T("Validation error: 'to' must be a non-empty string.");
+            response.Set(_T("message"), msg);
+            return Core::ERROR_GENERAL;
+        }
 
         // Validate registered apps (in this minimal build, allow if 'to' is registered)
         bool deliverable = IsRegistered(to.Value());
