@@ -152,6 +152,12 @@ if(PLUGIN_APP2APP_PROVIDER)
     add_subdirectory(app-gateway/App2AppProvider)
 endif()
 
+# New LaunchDelegate plugin integration
+option(PLUGIN_LAUNCHDELEGATE "Include LaunchDelegate plugin" ON)
+if(PLUGIN_LAUNCHDELEGATE)
+    add_subdirectory(app-gateway/LaunchDelegate)
+endif()
+
 if(WPEFRAMEWORK_CREATE_IPKG_TARGETS)
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEB_COMPONENT_INSTALL ON)
