@@ -224,6 +224,12 @@ DISABLE_SECURITY_TOKEN:BOOL=OFF
 //HAS_API_HDMI_INPUT
 HAS_API_HDMI_INPUT:BOOL=ON
 
+//No help, variable specified on the command line.
+PLUGIN_APP2APPPROVIDER:UNINITIALIZED=ON
+
+//No help, variable specified on the command line.
+PLUGIN_APPGATEWAY:UNINITIALIZED=ON
+
 //PLUGIN_CONTINUEWATCHING
 PLUGIN_CONTINUEWATCHING:BOOL=ON
 
@@ -274,6 +280,9 @@ Project_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
 Project_SOURCE_DIR:STATIC=/home/kavia/workspace/code-generation/entservices-infra-131648
+
+//No help, variable specified on the command line.
+RDK_SERVICES_L1_TEST:UNINITIALIZED=ON
 
 //USE_IARM
 USE_IARM:BOOL=ON
