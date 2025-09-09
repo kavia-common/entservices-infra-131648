@@ -17,41 +17,77 @@
 # limitations under the License.
 ###
 
-cmake_minimum_required(VERSION 3.3)
+# Minimum required must be before project()
+cmake_minimum_required(VERSION 3.10)
 
-find_package(WPEFramework)
+# Declare project so CMAKE_PROJECT_NAME and related variables exist
+project(EntServicesInfra LANGUAGES C CXX)
 
 # All packages that did not deliver a CMake Find script (and some deprecated scripts that need to be removed)
 # are located in the cmake directory. Include it in the search.
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/" "${CMAKE_SOURCE_DIR}/cmake/modules" "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
+# Options to control optional components/deps
 option(COMCAST_CONFIG "Comcast services configuration" ON)
-if(COMCAST_CONFIG)
-    include(services.cmake)
-endif()
-
 option(PLUGIN_OCICONTAINER "Include OCIContainer plugin" OFF)
-
-# Library installation section
-string(TOLOWER ${NAMESPACE} STORAGE_DIRECTORY)
-
-# for writing pc and config files
-include(CmakeHelperFunctions)
-
-if(RDK_SERVICE_L2_TEST)
-    add_subdirectory(Tests/L2Tests)
-endif()
-
 option(DISABLE_SECURITY_TOKEN "Disable security token" OFF)
 
+# Optionally enable building L1/L2 tests (guard missing external deps)
+option(RDK_SERVICE_L2_TEST "Enable L2 tests" OFF)
+option(RDK_SERVICES_L1_TEST "Enable L1 tests" OFF)
+
+# Try to find WPEFramework but do not fail hard so local dev can configure without SDK
+find_package(WPEFramework QUIET)
+if(NOT WPEFramework_FOUND)
+    message(WARNING "WPEFramework package not found. Set WPEFramework_DIR or CMAKE_PREFIX_PATH to the SDK. Plugins depending on it may fail to build.")
+endif()
+
+# Safe lowercase conversion for storage directory; if NAMESPACE is undefined, default to project name
+if(NOT DEFINED NAMESPACE)
+    set(NAMESPACE "${CMAKE_PROJECT_NAME}")
+endif()
+string(TOLOWER "${NAMESPACE}" STORAGE_DIRECTORY)
+
+# for writing pc and config files - include if present
+if(EXISTS "${CMAKE_SOURCE_DIR}/cmake/CmakeHelperFunctions.cmake")
+    include(CmakeHelperFunctions)
+else()
+    message(STATUS "Optional helper CmakeHelperFunctions.cmake not found; proceeding without it.")
+endif()
+
+# Load services configuration if requested
+if(COMCAST_CONFIG)
+    if(EXISTS "${CMAKE_SOURCE_DIR}/services.cmake")
+        include(services.cmake)
+    else()
+        message(WARNING "services.cmake not found; default plugin options may be unset.")
+    endif()
+endif()
+
+# Tests
+if(RDK_SERVICE_L2_TEST)
+    if(EXISTS "${CMAKE_SOURCE_DIR}/Tests/L2Tests/CMakeLists.txt")
+        add_subdirectory(Tests/L2Tests)
+    else()
+        message(STATUS "L2 tests directory not found; skipping.")
+    endif()
+endif()
+
 if(RDK_SERVICES_L1_TEST)
-    add_subdirectory(Tests/L1Tests)
+    if(EXISTS "${CMAKE_SOURCE_DIR}/Tests/L1Tests/CMakeLists.txt")
+        # Allow the L1Tests CMakeLists to skip optional deps (Plugins) when absent
+        set(ALLOW_OPTIONAL_TEST_DEPS ON CACHE BOOL "Allow skipping optional test dependencies if unavailable")
+        add_subdirectory(Tests/L1Tests)
+    else()
+        message(STATUS "L1 tests directory not found; skipping.")
+    endif()
 endif()
 
 if(DISABLE_SECURITY_TOKEN)
     add_definitions(-DDISABLE_SECURITY_TOKEN)
 endif()
 
+# Conditionally add plugin subdirectories based on options that may be set via services.cmake or cache
 if(PLUGIN_USERSETTINGS)
     add_subdirectory(UserSettings)
 endif()
@@ -92,11 +128,11 @@ if(PLUGIN_MESSAGECONTROL)
     add_subdirectory(MessageControl)
 endif()
 
-if (PLUGIN_RESOURCEMANAGER)
+if(PLUGIN_RESOURCEMANAGER)
     add_subdirectory(ResourceManager)
 endif()
 
-if (PLUGIN_ANALYTICS)
+if(PLUGIN_ANALYTICS)
     add_subdirectory(Analytics)
 endif()
 
@@ -125,11 +161,11 @@ if(PLUGIN_APPMANAGER)
 endif()
 
 if(PLUGIN_RUNTIME_MANAGER)
-	add_subdirectory(RuntimeManager)
+    add_subdirectory(RuntimeManager)
 endif()
 
 if(PLUGIN_STORAGE_MANAGER)
-	add_subdirectory(StorageManager)
+    add_subdirectory(StorageManager)
 endif()
 
 if(PLUGIN_PACKAGE_MANAGER)
@@ -137,27 +173,40 @@ if(PLUGIN_PACKAGE_MANAGER)
 endif()
 
 if(PLUGIN_NATIVEJS)
-	add_subdirectory(NativeJS)
+    add_subdirectory(NativeJS)
 endif()
 
 # New AppGateway plugin integration
 option(PLUGIN_APPGATEWAY "Include AppGateway plugin" ON)
 if(PLUGIN_APPGATEWAY)
-    add_subdirectory(app-gateway/AppGateway)
+    if(EXISTS "${CMAKE_SOURCE_DIR}/app-gateway/AppGateway/CMakeLists.txt")
+        add_subdirectory(app-gateway/AppGateway)
+    else()
+        message(STATUS "AppGateway plugin directory not found; skipping.")
+    endif()
 endif()
 
 # New App2AppProvider plugin integration
 option(PLUGIN_APP2APP_PROVIDER "Include App2AppProvider plugin" ON)
 if(PLUGIN_APP2APP_PROVIDER)
-    add_subdirectory(app-gateway/App2AppProvider)
+    if(EXISTS "${CMAKE_SOURCE_DIR}/app-gateway/App2AppProvider/CMakeLists.txt")
+        add_subdirectory(app-gateway/App2AppProvider)
+    else()
+        message(STATUS "App2AppProvider plugin directory not found; skipping.")
+    endif()
 endif()
 
 # New LaunchDelegate plugin integration
 option(PLUGIN_LAUNCHDELEGATE "Include LaunchDelegate plugin" ON)
 if(PLUGIN_LAUNCHDELEGATE)
-    add_subdirectory(app-gateway/LaunchDelegate)
+    if(EXISTS "${CMAKE_SOURCE_DIR}/app-gateway/LaunchDelegate/CMakeLists.txt")
+        add_subdirectory(app-gateway/LaunchDelegate)
+    else()
+        message(STATUS "LaunchDelegate plugin directory not found; skipping.")
+    endif()
 endif()
 
+# Package config for ipkg if requested by environment
 if(WPEFRAMEWORK_CREATE_IPKG_TARGETS)
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEB_COMPONENT_INSTALL ON)

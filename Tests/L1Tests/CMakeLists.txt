@@ -22,7 +22,18 @@ set(MODULE_NAME ${NAMESPACE}${PLUGIN_NAME})
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(${NAMESPACE}Plugins REQUIRED)
+if(NOT DEFINED ALLOW_OPTIONAL_TEST_DEPS)
+    set(ALLOW_OPTIONAL_TEST_DEPS OFF)
+endif()
+find_package(${NAMESPACE}Plugins QUIET)
+if(NOT ${NAMESPACE}Plugins_FOUND)
+    if(ALLOW_OPTIONAL_TEST_DEPS)
+        message(WARNING "${NAMESPACE}Plugins package not found; skipping L1 tests as optional.")
+        return()
+    else()
+        message(FATAL_ERROR "${NAMESPACE}Plugins package not found and optional skipping is disabled. Set ${NAMESPACE}Plugins_DIR/CMAKE_PREFIX_PATH or enable ALLOW_OPTIONAL_TEST_DEPS.")
+    endif()
+endif()
 
 set (TEST_SRC
     tests/test_UtilsFile.cpp
