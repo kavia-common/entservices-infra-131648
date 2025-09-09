@@ -253,6 +253,10 @@ ENABLE_CLANG_TIDY:BOOL=OFF
 // available)
 ENABLE_CPPCHECK:BOOL=OFF
 
+//Enable building example/test plugins and JavaScript assets (auto-disables
+// if toolchains missing)
+ENABLE_EXAMPLE_TEST_PLUGINS_AND_JS:BOOL=ON
+
 //The directory containing a CMake configuration file for EntServicesInfraPlugins.
 EntServicesInfraPlugins_DIR:PATH=EntServicesInfraPlugins_DIR-NOTFOUND
 
@@ -280,6 +284,9 @@ IARMHAL_INCLUDE_DIRS:PATH=IARMHAL_INCLUDE_DIRS-NOTFOUND
 //Path to a file.
 IARMRECEIVER_INCLUDE_DIRS:PATH=IARMRECEIVER_INCLUDE_DIRS-NOTFOUND
 
+//Path to a library.
+JAVASCRIPTCORE_LIBRARY:FILEPATH=JAVASCRIPTCORE_LIBRARY-NOTFOUND
+
 //Value Computed by CMake
 LaunchDelegate_BINARY_DIR:STATIC=/home/kavia/workspace/code-generation/entservices-infra-131648/build/app-gateway/LaunchDelegate
 
@@ -291,6 +298,12 @@ LaunchDelegate_LIB_DEPENDS:STATIC=general;WPEFrameworkCore;general;WPEFrameworkP
 
 //Value Computed by CMake
 LaunchDelegate_SOURCE_DIR:STATIC=/home/kavia/workspace/code-generation/entservices-infra-131648/app-gateway/LaunchDelegate
+
+//Path to a program.
+NODE_EXECUTABLE:FILEPATH=/usr/bin/node
+
+//Path to a program.
+NPM_EXECUTABLE:FILEPATH=/usr/bin/npm
 
 //Arguments to supply to pkg-config
 PKG_CONFIG_ARGN:STRING=

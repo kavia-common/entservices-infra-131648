@@ -72,6 +72,49 @@ option(DISABLE_SECURITY_TOKEN "Disable security token" OFF)
 option(RDK_SERVICE_L2_TEST "Enable L2 tests" OFF)
 option(RDK_SERVICES_L1_TEST "Enable L1 tests" OFF)
 
+# Toggle for example/test plugins and JS assets
+# When OFF, explicitly disable building such features.
+# When ON (default), attempt to build but gracefully disable if toolchains are missing.
+option(ENABLE_EXAMPLE_TEST_PLUGINS_AND_JS "Enable building example/test plugins and JavaScript assets (auto-disables if toolchains missing)" ON)
+
+# Detect toolchains relevant to JS assets
+find_program(NODE_EXECUTABLE NAMES node nodejs QUIET)
+find_program(NPM_EXECUTABLE NAMES npm QUIET)
+find_library(JAVASCRIPTCORE_LIBRARY NAMES JavaScriptCore QUIET)
+
+set(JS_TOOLCHAINS_AVAILABLE FALSE)
+if(NODE_EXECUTABLE AND NPM_EXECUTABLE)
+    set(JS_TOOLCHAINS_AVAILABLE TRUE)
+endif()
+
+set(JAVASCRIPTCORE_AVAILABLE FALSE)
+if(JAVASCRIPTCORE_LIBRARY)
+    set(JAVASCRIPTCORE_AVAILABLE TRUE)
+endif()
+
+# Apply gating rules
+if(NOT ENABLE_EXAMPLE_TEST_PLUGINS_AND_JS)
+    # Ensure L1/L2 tests and JS-dependent examples/features are disabled when toggle is OFF
+    set(RDK_SERVICE_L2_TEST OFF CACHE BOOL "Disabled due to ENABLE_EXAMPLE_TEST_PLUGINS_AND_JS=OFF" FORCE)
+    set(RDK_SERVICES_L1_TEST OFF CACHE BOOL "Disabled due to ENABLE_EXAMPLE_TEST_PLUGINS_AND_JS=OFF" FORCE)
+
+    # NativeJS depends on JavaScriptCore toolchains; treat it as part of JS assets/examples
+    if(DEFINED PLUGIN_NATIVEJS AND PLUGIN_NATIVEJS)
+        set(PLUGIN_NATIVEJS OFF CACHE BOOL "Disabled due to ENABLE_EXAMPLE_TEST_PLUGINS_AND_JS=OFF" FORCE)
+    endif()
+    message(STATUS "Example/test plugins and JS assets disabled by configuration (ENABLE_EXAMPLE_TEST_PLUGINS_AND_JS=OFF).")
+else()
+    # If toggle is ON but JS toolchains are missing, auto-disable JS-dependent features
+    if(NOT JS_TOOLCHAINS_AVAILABLE OR NOT JAVASCRIPTCORE_AVAILABLE)
+        if(DEFINED PLUGIN_NATIVEJS AND PLUGIN_NATIVEJS)
+            set(PLUGIN_NATIVEJS OFF CACHE BOOL "Auto-disabled: missing Node/NPM or JavaScriptCore" FORCE)
+        endif()
+        message(STATUS
+            "JS toolchains not found; JS-dependent features will be skipped. "
+            "Node/NPM available: ${JS_TOOLCHAINS_AVAILABLE}; JavaScriptCore available: ${JAVASCRIPTCORE_AVAILABLE}")
+    endif()
+endif()
+
 # Try to find WPEFramework but do not fail hard so local dev can configure without SDK
 find_package(WPEFramework QUIET)
 if(NOT WPEFramework_FOUND)
