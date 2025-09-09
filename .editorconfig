@@ -1,0 +1,53 @@
+# EditorConfig is awesome: https://editorconfig.org
+# This file enforces consistent line endings, charset, final newline, and indentation.
+# - LF line endings, UTF-8 charset, insert final newline
+# - Indentation:
+#   * CMake: 2 spaces
+#   * C/C++/JS: 4 spaces
+#   * Markdown: 2 spaces, don't trim trailing whitespace (used for line breaks)
+# - Ignore/disable formatting for common binary files
+
+root = true
+
+# Defaults for all files
+[*]
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# CMake files use 2-space indentation
+[CMakeLists.txt]
+indent_style = space
+indent_size = 2
+
+[*.cmake]
+indent_style = space
+indent_size = 2
+
+# C and C++ sources/headers use 4-space indentation (explicit, even though default is 4)
+[*.{c,cc,cpp,cxx,h,hpp,hh,hxx,ipp,inl}]
+indent_style = space
+indent_size = 4
+
+# JavaScript uses 4-space indentation
+[*.{js,jsx}]
+indent_style = space
+indent_size = 4
+
+# Markdown uses 2-space indentation and preserves trailing spaces for hard line breaks
+[*.md]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+# Disable formatting rules for common binary assets
+[*.{png,jpg,jpeg,gif,bmp,ico,icns,webp,tiff,pdf,zip,tar,gz,bz2,7z,rar,exe,dll,so,dylib,class,jar,bin,wasm,pkl,sqlite,db,mp3,mp4,mov,avi,webm,ogg}]
+end_of_line = unset
+charset = unset
+insert_final_newline = false
+trim_trailing_whitespace = false
+indent_style = unset
+indent_size = unset
